@@ -11,37 +11,31 @@
      # -> http://ruby-doc.org/stdlib-2.2.2/libdoc/csv/rdoc/CSV.html
          #title, upvote, category are the required columns
 
-require 'typhoeus'#library that faciltates http requests
-require 'pry'
-#require 'pry-byebug'
+
+require 'Typhoeus'
+require 'Pry'
 require 'json'
 
-def connect_to_api(url)
+url = 'http://mashable.com/stories.json'
+
+def call_reddit_api(url)
   response = Typhoeus.get(url)
   json_response = JSON.parse(response.body)
-
+  story_hash(json_response)
 end
 
-def stories(json_response)
-  stories = json_response["data"]["children"] ##this drills into the json to the point the content begins
+def story_hash(json_response)
+  stories = json_response["new"]
   stories.each do |story|
-    create_story_hash(story["data"])   ##this goes through each "data" section which contains a story and triggers the next method
+    story_hash(story)
   end
 end
 
-def create_story_hash(story)
-  story_hash = {title: story["title"], upvotes: story["ups"], category: story["subreddit"]}
-  create_story_array(story_hash)
+def story_hash(story)
+  story_hash = {title: story["title"]}
+  puts story_hash
 end
 
-def create_story_array(story_hash)
-  story_array = []
-  puts story_array.push(story_hash)
-end
-
-
-url ='http://www.reddit.com/.json'
-json_response = connect_to_api(url)
-
-
-stories(json_response)
+#########################
+call_reddit_api(url)
+#puts json_response
